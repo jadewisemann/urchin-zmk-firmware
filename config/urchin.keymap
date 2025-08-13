@@ -37,7 +37,6 @@ urchin: log
 &lt {
   quick-tap-ms = <100>;
   global-quick-tap;
-  flavor = "balanced";
   tapping-term-ms = <135>;
 };
 
@@ -167,7 +166,7 @@ urchin: log
 		combo_left_thumb {
 			timeout-ms = <80>;
 			key-positions = <30 31>;
-			bindings = <&kp LG(ESC)>;
+			bindings = <&mt LGUI ESC>;
 		};
 
 		combo_right_thumb {
@@ -212,7 +211,7 @@ urchin: log
 		nav_layer {
 			label = "nav";
 			bindings = <
-				&kp N6 				&kp N7		    &kp N8        &kp N9     	 &kp N0              &kp TAB         &kp HOME      &kp UP       &kp BACKSPACE &none 
+				&kp N6 				&kp N7		    &kp NUMBER_8  &kp N9     	 &kp N0              &kp TAB         &kp HOME      &kp UP       &kp BACKSPACE &none 
 				&kp N1        &kp N2     		&kp N3     		&kp N4     	 &kp N5              &kp SPACE       &kp LEFT      &kp DOWN     &kp RIGHT     &mt LCTRL ENTER
 				&kp LSHFT 	  &kp LALT      &kp COMMA     &kp DOT      &caps_word          &kp PRINTSCREEN &kp END       &kp PAGE_UP  &kp PAGE_DOWN &none
 																									&trans		   &trans  				     &trans				   &trans
@@ -245,10 +244,10 @@ urchin: log
 		settings_layer {
 				label = "set";
 				bindings = <
-				&bootloader    &none   &none      &bt BT_CLR     &bt BT_SEL 0       &bt BT_SEL 3    &none    &unstick   &none   &bootloader 
-				&none          &none   &none      &none          &bt BT_SEL 1       &bt BT_SEL 4    &none    &none      &none   &none
-				&studio_unlock &none   &none      &none          &bt BT_SEL 2       &bt BT_SEL 5    &none    &none      &none   &studio_unlock
-																					&none          &none              &none           &none 
+				&bootloader    &none    &out OUT_TOG      &bt BT_CLR     &bt BT_SEL 0       &bt BT_SEL 3    &none    &unstick   &none   &bootloader 
+				&none          &none    &out OUT_BLE      &none          &bt BT_SEL 1       &bt BT_SEL 4    &none    &none      &none   &none
+				&studio_unlock &none    &out OUT_USB      &none          &bt BT_SEL 2       &bt BT_SEL 5    &none    &none      &none   &studio_unlock
+																									&none          &none              &none           &none 
 				>;
 		};
 
