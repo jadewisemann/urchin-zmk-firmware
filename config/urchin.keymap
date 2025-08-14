@@ -1,10 +1,14 @@
 /*
-urchin_zmk_1.0.0
+urchin_zmk_jade
+--- history ---
+1.0.0: init
+1.0.1: minor fix
+1.0.2: apply experimental bluetooth setting to fit with window os
+1.0.3: minor bluetooth fix
 ---
-urchin: log
-25 08 13: arrive
-
+1.1.0: add mac os layer - COMPLETED
 */
+
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
@@ -19,126 +23,205 @@ urchin: log
 #define FUNC 3
 #define FUNC2 4
 #define SETTINGS 5
-#define DUMMY 6
+#define MAC_TOGGLE 6
+#define MAC_OVERLAY 7
+#define MAC_FUNC 8
+#define MAC_FUNC2 9
+#define DUMMY 10
 // -----------------
 
 &sk {
-	// don't release mods on other mods presses
 	ignore-modifiers;
 };
 
 &mt {
   quick-tap-ms = <100>;
-  global-quick-tap;
   flavor = "tap-preferred";
   tapping-term-ms = <135>;
 };
 
 &lt {
   quick-tap-ms = <100>;
-  global-quick-tap;
   tapping-term-ms = <135>;
 };
 
 
 / {
-	
 	behaviors {
-		// Enables holding the first mod-tap key
-		// by performing a tap-release-hold sequence.
-		// To use it: "&qt KEYCODE1 KEYCODE2"
 		qt: quick_tap {
 			compatible = "zmk,behavior-hold-tap";
-			label = "QUICK_TAP";
 			#binding-cells = <2>;
 			flavor = "hold-preferred";
 			tapping-term-ms = <200>;
 			quick-tap-ms = <200>;
 			bindings = <&kp>, <&kp>;
 		};
+
+		ht_bootloader: ht_bootloader {
+			compatible = "zmk,behavior-hold-tap";
+			#binding-cells = <2>;
+			flavor = "hold-preferred";
+			tapping-term-ms = <5000>;
+			bindings = <&bootloader>, <&none>;
+		};
+	};
+
+	conditional_layers {
+		compatible = "zmk,conditional-layers";
+
+		mac_base_mode {
+			if-layers = <MAC_TOGGLE>;
+			then-layer = <MAC_OVERLAY>;
+		};
+
+		mac_func_mode {
+			if-layers = <FUNC MAC_TOGGLE>;
+			then-layer = <MAC_FUNC>;
+		};
+
+		mac_func2_mode {
+			if-layers = <FUNC2 MAC_TOGGLE>;
+			then-layer = <MAC_FUNC2>;
+		};		
 	};
 
 	macros {
 		unstick: unstick {
-			// sometimes my device thinks a modifier is being held down
-			// pressing all modifiers fixes it.
 			label = "ZM_unstick";
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings = <&kp LSHIFT &kp RSHIFT &kp LCTRL &kp RCTRL &kp LALT &kp RALT &kp LGUI &kp RGUI>;
+			bindings = <
+				&kp LSHIFT &kp RSHIFT &kp LCTRL &kp RCTRL &kp LALT &kp RALT &kp LGUI &kp RGUI
+			>;
 		};
 
+		// vscode shortcut -- windows
 		vsc_focus_left: vsc_focus_left {
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings =
-				<
-					&kp LC(K) &kp LC(LEFT)
-				>;
-			
+			bindings = <&kp LC(K) &kp LC(LEFT)>;
 		};
 
 		vsc_focus_down: vsc_focus_down {
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings =
-				<
-					&kp LC(K) &kp LC(DOWN)
-				>;
+			bindings = <&kp LC(K) &kp LC(DOWN)>;
 		};
 
 		vsc_focus_right: vsc_focus_right {
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings =
-				<
-					&kp LC(K) &kp LC(RIGHT)
-				>;
+			bindings = <&kp LC(K) &kp LC(RIGHT)>;
 		};
 
 		vsc_focus_up: vsc_focus_up {
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings =
-				<
-					&kp LC(K) &kp LC(UP)
-				>;
+			bindings = <&kp LC(K) &kp LC(UP)>;
 		};
 
 		vsc_move_left: vsc_move_left {
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings =
-				<
-					&kp LC(K) &kp UP
-				>;
+			bindings = <&kp LC(K) &kp LEFT>;
 		};
 		
 		vsc_move_down: vsc_move_down {
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings =
-				<
-					&kp LC(K) &kp DOWN
-				>;
+			bindings = <&kp LC(K) &kp DOWN>;
 		};
 
 		vsc_move_right: vsc_move_right {
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings =
-				<
-					&kp LC(K) &kp RIGHT
-				>;
+			bindings = <&kp LC(K) &kp RIGHT>;
 		};
 
 		vsc_move_up: vsc_move_up {
 			compatible = "zmk,behavior-macro";
 			#binding-cells = <0>;
-			bindings =
-				<
-					&kp LC(K) &kp UP
-				>;
+			bindings = <&kp LC(K) &kp UP>;
+		};
+
+		// vscode -- macos
+		mac_vsc_focus_left: mac_vsc_focus_left {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(K) &kp LG(LEFT)>;
+		};
+
+		mac_vsc_focus_down: mac_vsc_focus_down {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(K) &kp LG(DOWN)>;
+		};
+
+		mac_vsc_focus_right: mac_vsc_focus_right {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(K) &kp LG(RIGHT)>;
+		};
+
+		mac_vsc_focus_up: mac_vsc_focus_up {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(K) &kp LG(UP)>;
+		};
+
+		mac_vsc_move_left: mac_vsc_move_left {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(K) &kp LG(LEFT)>;
+		};
+		
+		mac_vsc_move_down: mac_vsc_move_down {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(K) &kp LG(DOWN)>;
+		};
+
+		mac_vsc_move_right: mac_vsc_move_right {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(K) &kp LG(RIGHT)>;
+		};
+
+		mac_vsc_move_up: mac_vsc_move_up {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(K) &kp LG(UP)>;
+		};
+
+		// shortcut for macos
+		mac_app_switch: mac_app_switch {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(TAB)>;
+		};
+
+		mac_spotlight: mac_spotlight {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(SPACE)>;
+		};
+
+		mac_mission_control: mac_mission_control {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp F3>;
+		};
+
+		mac_screenshot: mac_screenshot {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(LS(N4))>;
+		};
+
+		mac_partial_screenshot: mac_partial_screenshot {
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&kp LG(LS(N3))>;
 		};
 	};
 
@@ -180,12 +263,30 @@ urchin: log
 			key-positions = <31 32>;
 			bindings = <&mo SETTINGS>;
 		};
-	};
+
+		combo_bootloader_left {
+			timeout-ms = <50>;
+			key-positions = <0 10 20>;
+			bindings = <&ht_bootloader 0 0>;
+		};
+		
+		combo_bootloader_right {
+			timeout-ms = <50>;
+			key-positions = <9 19 29>;
+			bindings = <&ht_bootloader 0 0>;
+		};
+
+		combo_macos_toggle {
+			timeout-ms = <100>;
+			key-positions = <0 1 2>;
+			bindings = <&tog MAC_TOGGLE>;			
+		};
+	};	
 
 	keymap {
 		compatible = "zmk,keymap";
 
-		// #0
+		// #0: BASE layer
 		default_layer {		
 			label = "base";	
 			bindings = <
@@ -229,7 +330,7 @@ urchin: log
 			>;
 		};
 
-		// #4:  func_raise(_left_)
+		// #4: func_raise(_left_)
 		func_2_layer {
 			label = "func2";
 			bindings = <
@@ -242,16 +343,60 @@ urchin: log
 
 		// #5: setting
 		settings_layer {
-				label = "set";
-				bindings = <
-				&bootloader    &none    &out OUT_TOG      &bt BT_CLR     &bt BT_SEL 0       &bt BT_SEL 3    &none    &unstick   &none   &bootloader 
-				&none          &none    &out OUT_BLE      &none          &bt BT_SEL 1       &bt BT_SEL 4    &none    &none      &none   &none
-				&studio_unlock &none    &out OUT_USB      &none          &bt BT_SEL 2       &bt BT_SEL 5    &none    &none      &none   &studio_unlock
-																									&none          &none              &none           &none 
-				>;
+			label = "set";
+			bindings = <
+				&bootloader    &none    &out OUT_TOG      &bt BT_CLR     &bt BT_SEL 0       &bt BT_SEL 3    &none    &unstick   &tog MAC_TOGGLE   &bootloader 
+				&none          &none    &out OUT_BLE      &none          &bt BT_SEL 1       &bt BT_SEL 4    &none    &none      &none             &none
+				&studio_unlock &none    &out OUT_USB      &none          &bt BT_SEL 2       &bt BT_SEL 5    &none    &none      &none             &studio_unlock
+																									&none          &none              &none             &none 
+			>;
 		};
 
-		// #6:	dummy
+		// #6: mac toggle (투명 레이어)
+		mac_toggle_layer {
+			label = "mac_toggle";
+			bindings = <
+				&trans      &trans        &trans        &trans        &trans       &trans        &trans        &trans        &trans        &trans 
+				&trans      &trans        &trans        &trans        &trans       &trans        &trans        &trans        &trans        &trans 
+				&trans      &trans        &trans        &trans        &trans       &trans        &trans        &trans        &trans        &trans 
+																	&trans        &trans        &trans       &trans 
+			>;			
+		};
+
+		// #7: mac overlay - BASE 레이어 위에 오버라이드
+		mac_overlay_layer {
+			label = "mac_overlay";
+			bindings = <
+				&trans        &trans      &trans        &trans        &trans         &trans             &trans        &trans        &trans    &trans
+				&trans        &trans      &trans        &trans        &trans         &trans             &trans        &trans        &trans    &trans
+				&trans        &trans      &trans        &trans        &trans         &trans             &trans        &trans        &trans    &trans
+																								&trans        &mt LGUI TAB   &lt FUNC LC(SPACE) &trans
+			>;
+		};
+
+		// #8: mac func overlay - FUNC 레이어 위에 오버라이드  
+		mac_func_layer {
+			label = "mac_func";
+			bindings = <
+				&kp LG(W)         &kp LG(PAGE_UP)   	&mac_vsc_focus_up   &kp LG(PAGE_DOWN)     &none          &none    &trans       &trans        &trans	      &trans   
+				&mo FUNC2         &mac_vsc_focus_left &mac_vsc_focus_down &mac_vsc_focus_right  &none          &none    &trans       &trans        &trans         &trans 
+				&none             &kp LG(T)         	&kp LG(N)           &kp LG(LS(N))         &none          &none    &trans       &trans        &trans         &trans
+																																	&trans                &trans         &trans        &trans
+			>;
+		};
+
+		// #9: mac func2 overlay - FUNC2 레이어 위에 오버라이드
+		mac_func2_layer {
+			label = "mac_func2";
+			bindings = <
+				&none        &trans             &mac_vsc_move_up    &trans              &none       &none        &none        &none        &none        &none 
+				&none        &mac_vsc_move_left &mac_vsc_move_down  &mac_vsc_move_right &none       &none        &none        &none        &none        &none 
+				&none        &none              &none               &none               &none       &none        &none        &none        &none        &none 
+																														&trans              &trans      &trans       &trans
+			>;
+		};
+
+		// #10: dummy
 		dummy_layer {
 			label = "dummy";
 			bindings = <
